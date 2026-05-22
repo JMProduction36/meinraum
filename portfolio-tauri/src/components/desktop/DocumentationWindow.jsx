@@ -86,7 +86,7 @@ const DOCS = [
     color: '#ef4444',
   },
   {
-    id: 'docaux',
+    id: 'doc_aux',
     title: 'pfSense – Proxy Squid & ACL',
     category: 'Réseau',
     description: 'Configuration du proxy Squid avec règles ACL sur pfSense.',
