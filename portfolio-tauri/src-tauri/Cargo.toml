@@ -1,0 +1,26 @@
+[package]
+name = "mein-raum-portfolio"
+version = "1.0.0"
+description = "Mein Raum — Portfolio OS"
+authors = ["Mein Raum"]
+edition = "2021"
+
+[lib]
+name = "mein_raum_portfolio_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = [] }
+tauri-plugin-shell = "2.0.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
