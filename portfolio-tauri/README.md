@@ -78,7 +78,7 @@ src/
 │   ├── WorkExplorer.jsx  ← fetch projects.json
 │   ├── AboutWindow.jsx   ← fetch profile.json
 │   ├── ArchiveWindow.jsx ← fetch archive.json
-│   ├── ContactWindow.jsx
+│   ├── 
 │   ├── TerminalWindow.jsx
 │   ├── CaseStudy.jsx
 │   └── DesktopIcon.jsx
@@ -86,7 +86,7 @@ src/
 │   └── useGitHubData.js  ← hook de fetch avec cache + fallback
 ├── lib/
 │   ├── github.js         ← config URL GitHub raw
-│   └── ThemeContext.jsx  ← switcher Win11/Debian
+│   └── VfsContext.jsx    ← système de fichiers virtuel
 └── pages/
     └── Desktop.jsx       ← layout principal
 

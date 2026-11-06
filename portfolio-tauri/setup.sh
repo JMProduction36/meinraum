@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ============================================================
-#  MEIN RAUM — Script d'installation complet (Debian/Ubuntu)
+#  MEIN RAUM — Script d'installation complet (Linux)
 # ============================================================
 # Usage : bash setup.sh
 # Prérequis : avoir portfolio-tauri.zip dans le même dossier
@@ -23,7 +23,7 @@ fail() { echo -e "${RED}[✗]${NC} $1"; exit 1; }
 
 echo ""
 echo -e "${BOLD}╔══════════════════════════════════════╗${NC}"
-echo -e "${BOLD}║     MEIN RAUM — Setup Debian         ║${NC}"
+echo -e "${BOLD}║     MEIN RAUM — Setup Linux         ║${NC}"
 echo -e "${BOLD}╚══════════════════════════════════════╝${NC}"
 echo ""
 

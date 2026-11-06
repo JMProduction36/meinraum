@@ -1,7 +1,7 @@
 [package]
 name = "mein-raum-portfolio"
 version = "1.0.0"
-description = "Mein Raum — Portfolio OS"
+description = "Mein Raum — Windows 11 Portfolio OS simulation"
 authors = ["Mein Raum"]
 edition = "2021"
 
@@ -14,7 +14,6 @@ tauri-build = { version = "2.0.0", features = [] }
 
 [dependencies]
 tauri = { version = "2.0.0", features = [] }
-tauri-plugin-shell = "2.0.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 

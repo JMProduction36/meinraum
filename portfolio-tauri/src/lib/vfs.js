@@ -1,0 +1,20 @@
+// In-memory Windows-style filesystem. No host filesystem access.
+export const ROOT = 'C:\\'
+const norm = (p, cwd='C:\\Users\\JMP') => {
+  p=String(p||'').replaceAll('/','\\'); if (!/^[a-z]:\\/i.test(p)) p=`${cwd.replace(/\\$/,'')}\\${p}`;
+  const drive=p.slice(0,2).toUpperCase(), parts=[];
+  for(const part of p.slice(3).split('\\')) { if(!part||part==='.')continue; if(part==='..')parts.pop(); else parts.push(part) }
+  return `${drive}\\${parts.join('\\')}`
+}
+const key=p=>norm(p).toLowerCase()
+export function createVfs(seed={}) {
+ const nodes=new Map(); const put=(path,kind='dir',content='')=>nodes.set(key(path),{path:norm(path),kind,content:String(content),modified:new Date().toISOString()})
+ ;['C:\\','C:\\Users','C:\\Users\\JMP','C:\\Users\\JMP\\Desktop','C:\\Users\\JMP\\Documents','C:\\Users\\JMP\\Downloads','C:\\Users\\JMP\\Pictures','C:\\Program Files','C:\\Windows','C:\\Projects','C:\\Archive','C:\\Laboratory'].forEach(p=>put(p))
+ put('C:\\Users\\JMP\\Documents\\Bienvenue.txt','file','Bienvenue dans Mein Raum, une simulation Windows 11. Le système de fichiers est entièrement virtuel.\n')
+ put('C:\\Users\\JMP\\Documents\\Registre.md','file','Registre des documents techniques.\n')
+ put('C:\\Users\\JMP\\Documents\\Guide-Windows.pdf','file','/documents/guide-jmp.pdf')
+ const ensureParent=p=>{const parent=norm(p).replace(/\\[^\\]+$/,'')||'C:\\'; if(parent!==norm(p)&&!nodes.has(key(parent)))ensureParent(parent); if(!nodes.has(key(parent)))put(parent)}
+ const api={normalize:norm, get:(p,cwd)=>nodes.get(key(norm(p,cwd)))||null, exists:(p,cwd)=>nodes.has(key(norm(p,cwd))), list:(p,cwd)=>{p=norm(p,cwd); if(!nodes.has(key(p)))throw Error(`Chemin introuvable : ${p}`); if(nodes.get(key(p)).kind!=='dir')throw Error(`N’est pas un dossier : ${p}`); return [...nodes.values()].filter(n=>n.path.toLowerCase()!==p.toLowerCase()&&n.path.replace(/\\$/,'').toLowerCase().startsWith(p.replace(/\\$/,'').toLowerCase()+'\\')&&!n.path.slice(p.replace(/\\$/,'').length+1).includes('\\')).sort((a,b)=>a.kind===b.kind?a.path.localeCompare(b.path):a.kind==='dir'?-1:1)}, mkdir:(p,cwd)=>{p=norm(p,cwd);if(nodes.has(key(p)))throw Error(`Élément déjà présent : ${p}`);ensureParent(p);put(p);return nodes.get(key(p))}, write:(p,c,cwd)=>{p=norm(p,cwd);ensureParent(p);return put(p,'file',c)}, read:(p,cwd)=>{const n=api.get(p,cwd);if(!n)throw Error(`Fichier introuvable : ${norm(p,cwd)}`);if(n.kind==='dir')throw Error('Le chemin est un dossier.');return n.content}, remove:(p,cwd,recursive=false)=>{p=norm(p,cwd);if(!nodes.has(key(p)))throw Error(`Élément introuvable : ${p}`);const children=[...nodes.keys()].filter(k=>k.startsWith(key(p).replace(/\\$/,'')+'\\'));if(children.length&&!recursive)throw Error('Le dossier n’est pas vide. Utilisez -Recurse.');children.forEach(k=>nodes.delete(k));nodes.delete(key(p));return p}, copy:(src,dst,cwd)=>{const a=norm(src,cwd),b=norm(dst,cwd),n=nodes.get(key(a));if(!n)throw Error(`Élément introuvable : ${a}`);if(nodes.has(key(b))&&nodes.get(key(b)).kind==='dir') { const d=`${b.replace(/\\$/,'')}\\${a.split('\\').pop()}`;return api.copy(src,d,cwd) }ensureParent(b);put(b,n.kind,n.content);for(const child of [...nodes.values()].filter(x=>x.path.toLowerCase().startsWith(a.toLowerCase().replace(/\\$/,'')+'\\')))put(b+child.path.slice(a.length),child.kind,child.content);return b}, move:(src,dst,cwd)=>{const a=norm(src,cwd),b=norm(dst,cwd);api.copy(a,b);api.remove(a,cwd,true);return b}, rename:(p,name,cwd)=>{const a=norm(p,cwd),b=a.replace(/[^\\]+$/,String(name));api.move(a,b);return b}, search:q=>[...nodes.values()].filter(n=>n.path.toLowerCase().includes(String(q).toLowerCase())), all:()=>[...nodes.values()], seed:obj=>{for(const [folder,items] of Object.entries(obj||{})){const base=norm(folder); if(!nodes.has(key(base)))api.mkdir(base); for(const item of items||[]){const title=item.name||item.title||`Document-${Math.random().toString(16).slice(2,6)}`;api.write(`${base}\\${title}.${item.extension||'txt'}`,item.description||item.content||JSON.stringify(item,null,2))}}}}
+ return api
+}
+export const virtualFileSystem=createVfs()
